@@ -107,8 +107,15 @@ class HomePage extends ConsumerWidget {
                             color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
                       ),
                     ),
-                    onSelected: (v) {
-                      if (v == 'logout') ref.read(userProfileProvider.notifier).signOut();
+                    onSelected: (v) async {
+                      if (v == 'logout') {
+                        await ref.read(userProfileProvider.notifier).signOut();
+                        if (context.mounted) {
+                          Navigator.of(context).pushNamedAndRemoveUntil('/login', (_) => false);
+                        }
+                        return;
+                      }
+                      if (!context.mounted) return;
                       if (v == 'credits') Navigator.pushNamed(context, '/credits');
                       if (v == 'history') Navigator.pushNamed(context, '/history', arguments: 'tts');
                       if (v == 'admin') Navigator.pushNamed(context, '/admin');

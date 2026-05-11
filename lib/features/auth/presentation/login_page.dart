@@ -49,11 +49,14 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
         _emailController.text.trim(),
         _passwordController.text,
       );
+      if (mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Đăng nhập thất bại: ${e.toString()}'),
+            content: Text('Đăng nhập thất bại: ${_friendlyError(e)}'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -61,6 +64,14 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  String _friendlyError(Object e) {
+    final msg = e.toString().toLowerCase();
+    if (msg.contains('invalid login credentials')) return 'Email hoặc mật khẩu không đúng';
+    if (msg.contains('email not confirmed')) return 'Email chưa được xác thực, kiểm tra hộp thư';
+    if (msg.contains('network')) return 'Lỗi mạng, thử lại sau';
+    return e.toString();
   }
 
   @override

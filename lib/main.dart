@@ -14,15 +14,19 @@ void main() async {
     debugPrint('Supabase init error: $e');
   }
 
+  // Check if user is already logged in
+  final isLoggedIn = SupabaseService.isAuthenticated;
+
   runApp(
-    const ProviderScope(
-      child: TTSNmaApp(),
+    ProviderScope(
+      child: TTSNmaApp(isLoggedIn: isLoggedIn),
     ),
   );
 }
 
 class TTSNmaApp extends StatelessWidget {
-  const TTSNmaApp({super.key});
+  final bool isLoggedIn;
+  const TTSNmaApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +34,7 @@ class TTSNmaApp extends StatelessWidget {
       title: 'TTS Nma',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      initialRoute: '/login',
+      initialRoute: isLoggedIn ? '/home' : '/login',
       onGenerateRoute: AppRouter.generateRoute,
     );
   }

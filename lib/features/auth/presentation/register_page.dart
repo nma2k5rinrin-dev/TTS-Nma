@@ -41,18 +41,32 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         _passwordController.text,
         _nameController.text.trim(),
       );
+
+      // Check if user is now logged in (no email confirmation required)
+      final profile = ref.read(userProfileProvider);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đăng ký thành công! Vui lòng kiểm tra email để xác thực.'),
-            backgroundColor: AppColors.success,
-          ),
-        );
+        if (profile.value != null) {
+          // Auto-logged in → go to home
+          Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
+        } else {
+          // Email confirmation required → back to login
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('📧 Đăng ký thành công! Kiểm tra email để xác thực tài khoản.'),
+              backgroundColor: AppColors.success,
+              duration: Duration(seconds: 4),
+            ),
+          );
+          Navigator.of(context).pop(); // Back to login
+        }
       }
     } catch (e) {
       if (mounted) {
+        String msg = e.toString();
+        if (msg.contains('already registered')) msg = 'Email này đã được đăng ký';
+        if (msg.contains('password')) msg = 'Mật khẩu phải có ít nhất 6 ký tự';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
+          SnackBar(content: Text('Lỗi: $msg'), backgroundColor: AppColors.error),
         );
       }
     } finally {
