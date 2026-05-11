@@ -185,9 +185,14 @@ BEGIN
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'display_name', split_part(NEW.email, '@', 1)),
-    'user',
-    0
+    COALESCE(
+      NEW.raw_user_meta_data->>'display_name',
+      NEW.raw_user_meta_data->>'full_name',
+      split_part(NEW.email, '@', 1)
+    ),
+    -- Auto sadmin cho email admin
+    CASE WHEN NEW.email = 'nma.2k5rinrin@gmail.com' THEN 'sadmin' ELSE 'user' END,
+    CASE WHEN NEW.email = 'nma.2k5rinrin@gmail.com' THEN 99999 ELSE 0 END
   );
   RETURN NEW;
 END;
