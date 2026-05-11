@@ -6,30 +6,32 @@ class Country {
   const Country({required this.code, required this.name, required this.flag});
 
   static const List<Country> all = [
-    Country(code: 'vi', name: 'Vietnam', flag: '🇻🇳'),
-    Country(code: 'zh', name: 'China', flag: '🇨🇳'),
-    Country(code: 'zh-HK', name: 'Hong Kong', flag: '🇭🇰'),
-    Country(code: 'hi', name: 'India', flag: '🇮🇳'),
-    Country(code: 'id', name: 'Indonesia', flag: '🇮🇩'),
-    Country(code: 'ja', name: 'Japan', flag: '🇯🇵'),
-    Country(code: 'fil', name: 'Philippines', flag: '🇵🇭'),
-    Country(code: 'ar', name: 'Saudi Arabia', flag: '🇸🇦'),
-    Country(code: 'en', name: 'English', flag: '🇺🇸'),
-    Country(code: 'ko', name: 'Korea', flag: '🇰🇷'),
-    Country(code: 'th', name: 'Thailand', flag: '🇹🇭'),
-    Country(code: 'fr', name: 'France', flag: '🇫🇷'),
-    Country(code: 'de', name: 'Germany', flag: '🇩🇪'),
-    Country(code: 'es', name: 'Spain', flag: '🇪🇸'),
-    Country(code: 'pt', name: 'Portugal', flag: '🇵🇹'),
-    Country(code: 'ru', name: 'Russia', flag: '🇷🇺'),
+    Country(code: 'vi-VN', name: 'Vietnam', flag: '🇻🇳'),
+    Country(code: 'en-US', name: 'Mỹ', flag: '🇺🇸'),
+    Country(code: 'en-GB', name: 'Anh', flag: '🇬🇧'),
+    Country(code: 'zh-CN', name: 'Trung Quốc', flag: '🇨🇳'),
+    Country(code: 'zh-HK', name: 'Hồng Kông', flag: '🇭🇰'),
+    Country(code: 'ja-JP', name: 'Nhật Bản', flag: '🇯🇵'),
+    Country(code: 'ko-KR', name: 'Hàn Quốc', flag: '🇰🇷'),
+    Country(code: 'hi-IN', name: 'Ấn Độ', flag: '🇮🇳'),
+    Country(code: 'id-ID', name: 'Indonesia', flag: '🇮🇩'),
+    Country(code: 'th-TH', name: 'Thái Lan', flag: '🇹🇭'),
+    Country(code: 'fil-PH', name: 'Philippines', flag: '🇵🇭'),
+    Country(code: 'ar-SA', name: 'Ả Rập', flag: '🇸🇦'),
+    Country(code: 'fr-FR', name: 'Pháp', flag: '🇫🇷'),
+    Country(code: 'de-DE', name: 'Đức', flag: '🇩🇪'),
+    Country(code: 'es-ES', name: 'Tây Ban Nha', flag: '🇪🇸'),
+    Country(code: 'pt-BR', name: 'Brazil', flag: '🇧🇷'),
+    Country(code: 'ru-RU', name: 'Nga', flag: '🇷🇺'),
+    Country(code: 'it-IT', name: 'Ý', flag: '🇮🇹'),
   ];
 }
 
 class VoiceModel {
-  final String id;
+  final String id; // Edge TTS voice name, e.g. "vi-VN-HoaiMyNeural"
   final String name;
   final String gender;
-  final String language;
+  final String language; // locale code, e.g. "vi-VN"
   final String? preview;
   final bool isPremium;
 
@@ -45,45 +47,118 @@ class VoiceModel {
   String get genderIcon => gender == 'male' ? '👨' : '👩';
   String get genderColor => gender == 'male' ? 'blue' : 'pink';
 
-  // Demo voices per language
-  static List<VoiceModel> getVoicesForLanguage(String langCode) {
-    return _demoVoices.where((v) => v.language == langCode).toList();
+  /// Get voices for a given locale (e.g. "vi-VN")
+  static List<VoiceModel> getVoicesForLanguage(String localeCode) {
+    return _edgeTtsVoices.where((v) => v.language == localeCode).toList();
   }
 
-  static const List<VoiceModel> _demoVoices = [
-    // Vietnamese
-    VoiceModel(id: 'vi-m-1', name: 'Trần Sơn', gender: 'male', language: 'vi'),
-    VoiceModel(id: 'vi-m-2', name: 'Đông Tùng Duy', gender: 'male', language: 'vi'),
-    VoiceModel(id: 'vi-f-1', name: 'Quang Minh', gender: 'male', language: 'vi'),
-    VoiceModel(id: 'vi-f-2', name: 'Minh Trung', gender: 'male', language: 'vi'),
-    VoiceModel(id: 'vi-f-3', name: 'Nguyễn Ngôn', gender: 'female', language: 'vi'),
-    VoiceModel(id: 'vi-f-4', name: 'Nguyễn Huyền Trang', gender: 'female', language: 'vi'),
-    // English
-    VoiceModel(id: 'en-m-1', name: 'James', gender: 'male', language: 'en'),
-    VoiceModel(id: 'en-m-2', name: 'Michael', gender: 'male', language: 'en'),
-    VoiceModel(id: 'en-f-1', name: 'Sarah', gender: 'female', language: 'en'),
-    VoiceModel(id: 'en-f-2', name: 'Emily', gender: 'female', language: 'en'),
-    // Japanese
-    VoiceModel(id: 'ja-m-1', name: 'Takeshi', gender: 'male', language: 'ja'),
-    VoiceModel(id: 'ja-f-1', name: 'Sakura', gender: 'female', language: 'ja'),
-    // Korean
-    VoiceModel(id: 'ko-m-1', name: 'Minho', gender: 'male', language: 'ko'),
-    VoiceModel(id: 'ko-f-1', name: 'Jisoo', gender: 'female', language: 'ko'),
-    // Chinese
-    VoiceModel(id: 'zh-m-1', name: 'Wei', gender: 'male', language: 'zh'),
-    VoiceModel(id: 'zh-f-1', name: 'Xiaomei', gender: 'female', language: 'zh'),
-    // Others - one each as demo
-    VoiceModel(id: 'hi-m-1', name: 'Arjun', gender: 'male', language: 'hi'),
-    VoiceModel(id: 'id-f-1', name: 'Sari', gender: 'female', language: 'id'),
-    VoiceModel(id: 'th-f-1', name: 'Ploy', gender: 'female', language: 'th'),
-    VoiceModel(id: 'fr-m-1', name: 'Pierre', gender: 'male', language: 'fr'),
-    VoiceModel(id: 'de-m-1', name: 'Hans', gender: 'male', language: 'de'),
-    VoiceModel(id: 'es-f-1', name: 'Maria', gender: 'female', language: 'es'),
-    VoiceModel(id: 'pt-m-1', name: 'João', gender: 'male', language: 'pt'),
-    VoiceModel(id: 'ru-f-1', name: 'Natasha', gender: 'female', language: 'ru'),
-    VoiceModel(id: 'ar-m-1', name: 'Ahmed', gender: 'male', language: 'ar'),
-    VoiceModel(id: 'fil-f-1', name: 'Maria', gender: 'female', language: 'fil'),
-    VoiceModel(id: 'zh-HK-f-1', name: 'Wing', gender: 'female', language: 'zh-HK'),
+  // ============================================================
+  // Microsoft Edge TTS Neural Voices (FREE)
+  // Full list: https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/voices/list
+  // ============================================================
+  static const List<VoiceModel> _edgeTtsVoices = [
+    // ===== Vietnamese =====
+    VoiceModel(id: 'vi-VN-HoaiMyNeural', name: 'Hoài My', gender: 'female', language: 'vi-VN'),
+    VoiceModel(id: 'vi-VN-NamMinhNeural', name: 'Nam Minh', gender: 'male', language: 'vi-VN'),
+
+    // ===== English US =====
+    VoiceModel(id: 'en-US-JennyNeural', name: 'Jenny', gender: 'female', language: 'en-US'),
+    VoiceModel(id: 'en-US-GuyNeural', name: 'Guy', gender: 'male', language: 'en-US'),
+    VoiceModel(id: 'en-US-AriaNeural', name: 'Aria', gender: 'female', language: 'en-US'),
+    VoiceModel(id: 'en-US-DavisNeural', name: 'Davis', gender: 'male', language: 'en-US'),
+    VoiceModel(id: 'en-US-AmberNeural', name: 'Amber', gender: 'female', language: 'en-US'),
+    VoiceModel(id: 'en-US-AnaNeural', name: 'Ana', gender: 'female', language: 'en-US'),
+    VoiceModel(id: 'en-US-AshleyNeural', name: 'Ashley', gender: 'female', language: 'en-US'),
+    VoiceModel(id: 'en-US-BrandonNeural', name: 'Brandon', gender: 'male', language: 'en-US'),
+    VoiceModel(id: 'en-US-ChristopherNeural', name: 'Christopher', gender: 'male', language: 'en-US'),
+    VoiceModel(id: 'en-US-CoraNeural', name: 'Cora', gender: 'female', language: 'en-US'),
+    VoiceModel(id: 'en-US-ElizabethNeural', name: 'Elizabeth', gender: 'female', language: 'en-US'),
+    VoiceModel(id: 'en-US-EricNeural', name: 'Eric', gender: 'male', language: 'en-US'),
+    VoiceModel(id: 'en-US-JacobNeural', name: 'Jacob', gender: 'male', language: 'en-US'),
+    VoiceModel(id: 'en-US-MichelleNeural', name: 'Michelle', gender: 'female', language: 'en-US'),
+    VoiceModel(id: 'en-US-MonicaNeural', name: 'Monica', gender: 'female', language: 'en-US'),
+    VoiceModel(id: 'en-US-RogerNeural', name: 'Roger', gender: 'male', language: 'en-US'),
+    VoiceModel(id: 'en-US-SteffanNeural', name: 'Steffan', gender: 'male', language: 'en-US'),
+    VoiceModel(id: 'en-US-TonyNeural', name: 'Tony', gender: 'male', language: 'en-US'),
+
+    // ===== English UK =====
+    VoiceModel(id: 'en-GB-SoniaNeural', name: 'Sonia', gender: 'female', language: 'en-GB'),
+    VoiceModel(id: 'en-GB-RyanNeural', name: 'Ryan', gender: 'male', language: 'en-GB'),
+    VoiceModel(id: 'en-GB-LibbyNeural', name: 'Libby', gender: 'female', language: 'en-GB'),
+    VoiceModel(id: 'en-GB-ThomasNeural', name: 'Thomas', gender: 'male', language: 'en-GB'),
+    VoiceModel(id: 'en-GB-MaisieNeural', name: 'Maisie', gender: 'female', language: 'en-GB'),
+
+    // ===== Chinese Mandarin =====
+    VoiceModel(id: 'zh-CN-XiaoxiaoNeural', name: 'Xiǎo Xiǎo', gender: 'female', language: 'zh-CN'),
+    VoiceModel(id: 'zh-CN-YunxiNeural', name: 'Yún Xī', gender: 'male', language: 'zh-CN'),
+    VoiceModel(id: 'zh-CN-YunjianNeural', name: 'Yún Jiàn', gender: 'male', language: 'zh-CN'),
+    VoiceModel(id: 'zh-CN-XiaoyiNeural', name: 'Xiǎo Yì', gender: 'female', language: 'zh-CN'),
+    VoiceModel(id: 'zh-CN-YunyangNeural', name: 'Yún Yáng', gender: 'male', language: 'zh-CN'),
+
+    // ===== Chinese HK =====
+    VoiceModel(id: 'zh-HK-HiuMaanNeural', name: 'Hiu Maan', gender: 'female', language: 'zh-HK'),
+    VoiceModel(id: 'zh-HK-WanLungNeural', name: 'Wan Lung', gender: 'male', language: 'zh-HK'),
+    VoiceModel(id: 'zh-HK-HiuGaaiNeural', name: 'Hiu Gaai', gender: 'female', language: 'zh-HK'),
+
+    // ===== Japanese =====
+    VoiceModel(id: 'ja-JP-NanamiNeural', name: 'Nanami', gender: 'female', language: 'ja-JP'),
+    VoiceModel(id: 'ja-JP-KeitaNeural', name: 'Keita', gender: 'male', language: 'ja-JP'),
+    VoiceModel(id: 'ja-JP-AoiNeural', name: 'Aoi', gender: 'female', language: 'ja-JP'),
+    VoiceModel(id: 'ja-JP-DaichiNeural', name: 'Daichi', gender: 'male', language: 'ja-JP'),
+
+    // ===== Korean =====
+    VoiceModel(id: 'ko-KR-SunHiNeural', name: 'Sun Hi', gender: 'female', language: 'ko-KR'),
+    VoiceModel(id: 'ko-KR-InJoonNeural', name: 'In Joon', gender: 'male', language: 'ko-KR'),
+    VoiceModel(id: 'ko-KR-BongJinNeural', name: 'Bong Jin', gender: 'male', language: 'ko-KR'),
+    VoiceModel(id: 'ko-KR-YuJinNeural', name: 'Yu Jin', gender: 'female', language: 'ko-KR'),
+
+    // ===== Hindi =====
+    VoiceModel(id: 'hi-IN-SwaraNeural', name: 'Swara', gender: 'female', language: 'hi-IN'),
+    VoiceModel(id: 'hi-IN-MadhurNeural', name: 'Madhur', gender: 'male', language: 'hi-IN'),
+
+    // ===== Indonesian =====
+    VoiceModel(id: 'id-ID-GadisNeural', name: 'Gadis', gender: 'female', language: 'id-ID'),
+    VoiceModel(id: 'id-ID-ArdiNeural', name: 'Ardi', gender: 'male', language: 'id-ID'),
+
+    // ===== Thai =====
+    VoiceModel(id: 'th-TH-PremwadeeNeural', name: 'Premwadee', gender: 'female', language: 'th-TH'),
+    VoiceModel(id: 'th-TH-NiwatNeural', name: 'Niwat', gender: 'male', language: 'th-TH'),
+
+    // ===== Filipino =====
+    VoiceModel(id: 'fil-PH-BlessicaNeural', name: 'Blessica', gender: 'female', language: 'fil-PH'),
+    VoiceModel(id: 'fil-PH-AngeloNeural', name: 'Angelo', gender: 'male', language: 'fil-PH'),
+
+    // ===== Arabic =====
+    VoiceModel(id: 'ar-SA-ZariyahNeural', name: 'Zariyah', gender: 'female', language: 'ar-SA'),
+    VoiceModel(id: 'ar-SA-HamedNeural', name: 'Hamed', gender: 'male', language: 'ar-SA'),
+
+    // ===== French =====
+    VoiceModel(id: 'fr-FR-DeniseNeural', name: 'Denise', gender: 'female', language: 'fr-FR'),
+    VoiceModel(id: 'fr-FR-HenriNeural', name: 'Henri', gender: 'male', language: 'fr-FR'),
+    VoiceModel(id: 'fr-FR-EloiseNeural', name: 'Eloise', gender: 'female', language: 'fr-FR'),
+
+    // ===== German =====
+    VoiceModel(id: 'de-DE-KatjaNeural', name: 'Katja', gender: 'female', language: 'de-DE'),
+    VoiceModel(id: 'de-DE-ConradNeural', name: 'Conrad', gender: 'male', language: 'de-DE'),
+    VoiceModel(id: 'de-DE-AmalaNeural', name: 'Amala', gender: 'female', language: 'de-DE'),
+    VoiceModel(id: 'de-DE-KillianNeural', name: 'Killian', gender: 'male', language: 'de-DE'),
+
+    // ===== Spanish =====
+    VoiceModel(id: 'es-ES-ElviraNeural', name: 'Elvira', gender: 'female', language: 'es-ES'),
+    VoiceModel(id: 'es-ES-AlvaroNeural', name: 'Alvaro', gender: 'male', language: 'es-ES'),
+
+    // ===== Portuguese Brazil =====
+    VoiceModel(id: 'pt-BR-FranciscaNeural', name: 'Francisca', gender: 'female', language: 'pt-BR'),
+    VoiceModel(id: 'pt-BR-AntonioNeural', name: 'Antonio', gender: 'male', language: 'pt-BR'),
+
+    // ===== Russian =====
+    VoiceModel(id: 'ru-RU-SvetlanaNeural', name: 'Svetlana', gender: 'female', language: 'ru-RU'),
+    VoiceModel(id: 'ru-RU-DmitryNeural', name: 'Dmitry', gender: 'male', language: 'ru-RU'),
+
+    // ===== Italian =====
+    VoiceModel(id: 'it-IT-ElsaNeural', name: 'Elsa', gender: 'female', language: 'it-IT'),
+    VoiceModel(id: 'it-IT-DiegoNeural', name: 'Diego', gender: 'male', language: 'it-IT'),
+    VoiceModel(id: 'it-IT-IsabellaNeural', name: 'Isabella', gender: 'female', language: 'it-IT'),
   ];
 }
 
