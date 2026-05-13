@@ -36,11 +36,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(userProfileProvider.notifier).signUp(
-        _emailController.text.trim(),
-        _passwordController.text,
-        _nameController.text.trim(),
-      );
+      await ref
+          .read(userProfileProvider.notifier)
+          .signUp(
+            _emailController.text.trim(),
+            _passwordController.text,
+            _nameController.text.trim(),
+          );
 
       // Check if user is now logged in (no email confirmation required)
       final profile = ref.read(userProfileProvider);
@@ -50,12 +52,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
         } else {
           // Email confirmation required → back to login
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('📧 Đăng ký thành công! Kiểm tra email để xác thực tài khoản.'),
-              backgroundColor: AppColors.success,
-              duration: Duration(seconds: 4),
-            ),
+          AppToast.success(
+            context,
+            'Đăng ký thành công! Kiểm tra email để xác thực tài khoản.',
           );
           Navigator.of(context).pop(); // Back to login
         }
@@ -63,11 +62,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     } catch (e) {
       if (mounted) {
         String msg = e.toString();
-        if (msg.contains('already registered')) msg = 'Email này đã được đăng ký';
+        if (msg.contains('already registered'))
+          msg = 'Email này đã được đăng ký';
         if (msg.contains('password')) msg = 'Mật khẩu phải có ít nhất 6 ký tự';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $msg'), backgroundColor: AppColors.error),
-        );
+        AppToast.error(context, 'Lỗi: $msg');
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -101,7 +99,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.arrow_back, size: 18),
                         label: const Text('Đăng nhập'),
-                        style: TextButton.styleFrom(foregroundColor: AppColors.textSecondary),
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.textSecondary,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -117,7 +117,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     const SizedBox(height: 8),
                     Text(
                       'Bắt đầu sử dụng dịch vụ TTS miễn phí',
-                      style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary),
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                     const SizedBox(height: 32),
                     // Form
@@ -130,27 +133,41 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           children: [
                             TextFormField(
                               controller: _nameController,
-                              style: const TextStyle(color: AppColors.textPrimary),
+                              style: const TextStyle(
+                                color: AppColors.textPrimary,
+                              ),
                               decoration: const InputDecoration(
                                 labelText: 'Tên hiển thị',
                                 hintText: 'Nhập tên của bạn',
-                                prefixIcon: Icon(Icons.person_outline, color: AppColors.textMuted),
+                                prefixIcon: Icon(
+                                  Icons.person_outline,
+                                  color: AppColors.textMuted,
+                                ),
                               ),
-                              validator: (v) => v == null || v.isEmpty ? 'Vui lòng nhập tên' : null,
+                              validator: (v) => v == null || v.isEmpty
+                                  ? 'Vui lòng nhập tên'
+                                  : null,
                             ),
                             const SizedBox(height: 16),
                             TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
-                              style: const TextStyle(color: AppColors.textPrimary),
+                              style: const TextStyle(
+                                color: AppColors.textPrimary,
+                              ),
                               decoration: const InputDecoration(
                                 labelText: 'Email',
                                 hintText: 'your@email.com',
-                                prefixIcon: Icon(Icons.email_outlined, color: AppColors.textMuted),
+                                prefixIcon: Icon(
+                                  Icons.email_outlined,
+                                  color: AppColors.textMuted,
+                                ),
                               ),
                               validator: (v) {
-                                if (v == null || v.isEmpty) return 'Vui lòng nhập email';
-                                if (!v.contains('@')) return 'Email không hợp lệ';
+                                if (v == null || v.isEmpty)
+                                  return 'Vui lòng nhập email';
+                                if (!v.contains('@'))
+                                  return 'Email không hợp lệ';
                                 return null;
                               },
                             ),
@@ -158,22 +175,33 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             TextFormField(
                               controller: _passwordController,
                               obscureText: _obscurePassword,
-                              style: const TextStyle(color: AppColors.textPrimary),
+                              style: const TextStyle(
+                                color: AppColors.textPrimary,
+                              ),
                               decoration: InputDecoration(
                                 labelText: 'Mật khẩu',
                                 hintText: 'Tối thiểu 6 ký tự',
-                                prefixIcon: const Icon(Icons.lock_outlined, color: AppColors.textMuted),
+                                prefixIcon: const Icon(
+                                  Icons.lock_outlined,
+                                  color: AppColors.textMuted,
+                                ),
                                 suffixIcon: IconButton(
                                   icon: Icon(
-                                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
                                     color: AppColors.textMuted,
                                   ),
-                                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                  onPressed: () => setState(
+                                    () => _obscurePassword = !_obscurePassword,
+                                  ),
                                 ),
                               ),
                               validator: (v) {
-                                if (v == null || v.isEmpty) return 'Vui lòng nhập mật khẩu';
-                                if (v.length < 6) return 'Mật khẩu tối thiểu 6 ký tự';
+                                if (v == null || v.isEmpty)
+                                  return 'Vui lòng nhập mật khẩu';
+                                if (v.length < 6)
+                                  return 'Mật khẩu tối thiểu 6 ký tự';
                                 return null;
                               },
                             ),
@@ -181,21 +209,31 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             TextFormField(
                               controller: _confirmPasswordController,
                               obscureText: _obscureConfirm,
-                              style: const TextStyle(color: AppColors.textPrimary),
+                              style: const TextStyle(
+                                color: AppColors.textPrimary,
+                              ),
                               decoration: InputDecoration(
                                 labelText: 'Xác nhận mật khẩu',
                                 hintText: 'Nhập lại mật khẩu',
-                                prefixIcon: const Icon(Icons.lock_outlined, color: AppColors.textMuted),
+                                prefixIcon: const Icon(
+                                  Icons.lock_outlined,
+                                  color: AppColors.textMuted,
+                                ),
                                 suffixIcon: IconButton(
                                   icon: Icon(
-                                    _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                                    _obscureConfirm
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
                                     color: AppColors.textMuted,
                                   ),
-                                  onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                                  onPressed: () => setState(
+                                    () => _obscureConfirm = !_obscureConfirm,
+                                  ),
                                 ),
                               ),
                               validator: (v) {
-                                if (v != _passwordController.text) return 'Mật khẩu không khớp';
+                                if (v != _passwordController.text)
+                                  return 'Mật khẩu không khớp';
                                 return null;
                               },
                             ),
@@ -208,11 +246,17 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                     ? const SizedBox(
                                         width: 24,
                                         height: 24,
-                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
                                       )
                                     : Text(
                                         'Đăng ký',
-                                        style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
+                                        style: GoogleFonts.inter(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                               ),
                             ),

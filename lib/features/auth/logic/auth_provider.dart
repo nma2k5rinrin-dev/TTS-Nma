@@ -14,9 +14,10 @@ final authStateProvider = StreamProvider<AuthState>((ref) {
 });
 
 // User profile provider using Notifier
-final userProfileProvider = NotifierProvider<UserProfileNotifier, AsyncValue<UserProfile?>>(
-  UserProfileNotifier.new,
-);
+final userProfileProvider =
+    NotifierProvider<UserProfileNotifier, AsyncValue<UserProfile?>>(
+      UserProfileNotifier.new,
+    );
 
 class UserProfileNotifier extends Notifier<AsyncValue<UserProfile?>> {
   @override
@@ -25,7 +26,12 @@ class UserProfileNotifier extends Notifier<AsyncValue<UserProfile?>> {
     // Listen to auth state changes (handles Google OAuth redirect back)
     ref.listen(authStateProvider, (prev, next) {
       next.whenData((authState) {
-        if (authState.event == AuthChangeEvent.signedIn) {
+        final hasSession = authState.session != null;
+        if ((authState.event == AuthChangeEvent.initialSession ||
+                authState.event == AuthChangeEvent.signedIn ||
+                authState.event == AuthChangeEvent.tokenRefreshed ||
+                authState.event == AuthChangeEvent.userUpdated) &&
+            hasSession) {
           _loadProfileAfterAuth();
         } else if (authState.event == AuthChangeEvent.signedOut) {
           state = const AsyncValue.data(null);
@@ -37,7 +43,10 @@ class UserProfileNotifier extends Notifier<AsyncValue<UserProfile?>> {
 
   Future<void> _init() async {
     try {
-      final profile = await ref.read(authRepositoryProvider).getCurrentProfile();
+      final user = Supabase.instance.client.auth.currentUser;
+      final profile = user == null
+          ? null
+          : await ref.read(authRepositoryProvider).ensureProfile();
       state = AsyncValue.data(profile);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -73,9 +82,9 @@ class UserProfileNotifier extends Notifier<AsyncValue<UserProfile?>> {
   Future<void> signUp(String email, String password, String displayName) async {
     state = const AsyncValue.loading();
     try {
-      final response = await ref.read(authRepositoryProvider).signUpWithEmail(
-        email, password, displayName,
-      );
+      final response = await ref
+          .read(authRepositoryProvider)
+          .signUpWithEmail(email, password, displayName);
 
       if (response.user != null) {
         // DB trigger will create profile — just wait and fetch it
@@ -111,7 +120,10 @@ class UserProfileNotifier extends Notifier<AsyncValue<UserProfile?>> {
   /// Manually refresh profile
   Future<void> refreshProfile() async {
     try {
-      final profile = await ref.read(authRepositoryProvider).getCurrentProfile();
+      final user = Supabase.instance.client.auth.currentUser;
+      final profile = user == null
+          ? null
+          : await ref.read(authRepositoryProvider).ensureProfile();
       state = AsyncValue.data(profile);
     } catch (e, st) {
       state = AsyncValue.error(e, st);

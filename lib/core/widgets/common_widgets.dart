@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
 
+export 'app_toast.dart';
+
 /// Glassmorphic card widget
 class GlassCard extends StatelessWidget {
   final Widget child;
@@ -74,7 +76,7 @@ class CreditBadge extends StatelessWidget {
             const Icon(Icons.monetization_on, color: Colors.white, size: 18),
             const SizedBox(width: 6),
             Text(
-              _formatCredits(credits),
+              '${_formatCredits(credits)} xu',
               style: GoogleFonts.inter(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
@@ -126,7 +128,9 @@ class FeatureCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: (gradient as LinearGradient).colors.first.withValues(alpha: 0.3),
+              color: (gradient as LinearGradient).colors.first.withValues(
+                alpha: 0.3,
+              ),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -166,7 +170,11 @@ class FeatureCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white70,
+              size: 16,
+            ),
           ],
         ),
       ),

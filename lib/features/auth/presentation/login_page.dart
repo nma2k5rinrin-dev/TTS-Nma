@@ -12,7 +12,8 @@ class LoginPage extends ConsumerStatefulWidget {
   ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProviderStateMixin {
+class _LoginPageState extends ConsumerState<LoginPage>
+    with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -45,21 +46,15 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(userProfileProvider.notifier).signIn(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
+      await ref
+          .read(userProfileProvider.notifier)
+          .signIn(_emailController.text.trim(), _passwordController.text);
       if (mounted) {
         Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Đăng nhập thất bại: ${_friendlyError(e)}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        AppToast.error(context, 'Đăng nhập thất bại: ${_friendlyError(e)}');
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -68,16 +63,29 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
 
   String _friendlyError(Object e) {
     final msg = e.toString().toLowerCase();
-    if (msg.contains('invalid login credentials')) return 'Email hoặc mật khẩu không đúng';
-    if (msg.contains('email not confirmed')) return 'Email chưa được xác thực, kiểm tra hộp thư';
-    if (msg.contains('network')) return 'Lỗi mạng, thử lại sau';
+    if (msg.contains('invalid login credentials')) {
+      return 'Email hoặc mật khẩu không đúng';
+    }
+    if (msg.contains('email not confirmed')) {
+      return 'Email chưa được xác thực, kiểm tra hộp thư';
+    }
+    if (msg.contains('network')) {
+      return 'Lỗi mạng, thử lại sau';
+    }
     return e.toString();
   }
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isWide = size.width > 800;
+    ref.listen(userProfileProvider, (previous, next) {
+      next.whenData((profile) {
+        if (profile == null || !mounted) return;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          Navigator.of(context).pushNamedAndRemoveUntil('/home', (_) => false);
+        });
+      });
+    });
 
     return Scaffold(
       body: Container(
@@ -85,11 +93,7 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF0D1117),
-              Color(0xFF161B22),
-              Color(0xFF0D1117),
-            ],
+            colors: [Color(0xFF0D1117), Color(0xFF161B22), Color(0xFF0D1117)],
           ),
         ),
         child: SafeArea(
@@ -142,7 +146,11 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
               ),
             ],
           ),
-          child: const Icon(Icons.record_voice_over, color: Colors.white, size: 36),
+          child: const Icon(
+            Icons.record_voice_over,
+            color: Colors.white,
+            size: 36,
+          ),
         ),
         const SizedBox(height: 20),
         Text(
@@ -190,7 +198,10 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
               decoration: const InputDecoration(
                 labelText: 'Email',
                 hintText: 'your@email.com',
-                prefixIcon: Icon(Icons.email_outlined, color: AppColors.textMuted),
+                prefixIcon: Icon(
+                  Icons.email_outlined,
+                  color: AppColors.textMuted,
+                ),
               ),
               validator: (v) {
                 if (v == null || v.isEmpty) return 'Vui lòng nhập email';
@@ -206,13 +217,17 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
               decoration: InputDecoration(
                 labelText: 'Mật khẩu',
                 hintText: '••••••••',
-                prefixIcon: const Icon(Icons.lock_outlined, color: AppColors.textMuted),
+                prefixIcon: const Icon(
+                  Icons.lock_outlined,
+                  color: AppColors.textMuted,
+                ),
                 suffixIcon: IconButton(
                   icon: Icon(
                     _obscurePassword ? Icons.visibility_off : Icons.visibility,
                     color: AppColors.textMuted,
                   ),
-                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
               validator: (v) {
@@ -280,9 +295,7 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
             await ref.read(userProfileProvider.notifier).signInWithGoogle();
           } catch (e) {
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
-              );
+              AppToast.error(context, 'Lỗi: $e');
             }
           }
         },
@@ -294,7 +307,9 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textPrimary,
           side: const BorderSide(color: AppColors.surfaceBorder),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );
@@ -306,7 +321,10 @@ class _LoginPageState extends ConsumerState<LoginPage> with SingleTickerProvider
       children: [
         Text(
           'Chưa có tài khoản? ',
-          style: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 14),
+          style: GoogleFonts.inter(
+            color: AppColors.textSecondary,
+            fontSize: 14,
+          ),
         ),
         TextButton(
           onPressed: () {

@@ -32,7 +32,10 @@ class HomePage extends ConsumerWidget {
   }
 
   PreferredSizeWidget _buildAppBar(
-      BuildContext context, WidgetRef ref, AsyncValue<UserProfile?> profileAsync) {
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<UserProfile?> profileAsync,
+  ) {
     return AppBar(
       backgroundColor: AppColors.surface,
       elevation: 0,
@@ -46,12 +49,21 @@ class HomePage extends ConsumerWidget {
               gradient: AppColors.primaryGradient,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.record_voice_over, color: Colors.white, size: 18),
+            child: const Icon(
+              Icons.record_voice_over,
+              color: Colors.white,
+              size: 18,
+            ),
           ),
           const SizedBox(width: 10),
-          Text('TTS Nma',
-              style: GoogleFonts.inter(
-                  fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+          Text(
+            'TTS Nma',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+          ),
         ],
       ),
       actions: [
@@ -65,16 +77,30 @@ class HomePage extends ConsumerWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.translate, size: 16, color: AppColors.textSecondary),
+              const Icon(
+                Icons.translate,
+                size: 16,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: 4),
-              Text('VI', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+              Text(
+                'VI',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                ),
+              ),
             ],
           ),
         ),
         const SizedBox(width: 8),
         // Dark mode icon
         IconButton(
-          icon: const Icon(Icons.dark_mode, color: AppColors.textSecondary, size: 20),
+          icon: const Icon(
+            Icons.dark_mode,
+            color: AppColors.textSecondary,
+            size: 20,
+          ),
           onPressed: () {},
         ),
         // Credits badge
@@ -98,81 +124,234 @@ class HomePage extends ConsumerWidget {
             data: (p) => p != null
                 ? PopupMenuButton<String>(
                     offset: const Offset(0, 48),
-                    icon: CircleAvatar(
-                      radius: 16,
-                      backgroundColor: AppColors.primary,
-                      child: Text(
-                        (p.displayName ?? p.email)[0].toUpperCase(),
-                        style: GoogleFonts.inter(
-                            color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceLight,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.surfaceBorder),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            radius: 14,
+                            backgroundColor: AppColors.primary,
+                            child: Text(
+                              (p.displayName != null &&
+                                          p.displayName!.isNotEmpty
+                                      ? p.displayName!
+                                      : (p.email.isNotEmpty ? p.email : '?'))[0]
+                                  .toUpperCase(),
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Tài khoản',
+                            style: GoogleFonts.inter(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const Icon(
+                            Icons.arrow_drop_down,
+                            color: AppColors.textSecondary,
+                            size: 20,
+                          ),
+                        ],
                       ),
                     ),
                     onSelected: (v) async {
                       if (v == 'logout') {
                         await ref.read(userProfileProvider.notifier).signOut();
                         if (context.mounted) {
-                          Navigator.of(context).pushNamedAndRemoveUntil('/login', (_) => false);
+                          Navigator.of(
+                            context,
+                          ).pushNamedAndRemoveUntil('/login', (_) => false);
                         }
                         return;
                       }
-                      if (!context.mounted) return;
-                      if (v == 'credits') Navigator.pushNamed(context, '/credits');
-                      if (v == 'history') Navigator.pushNamed(context, '/history', arguments: 'tts');
-                      if (v == 'admin') Navigator.pushNamed(context, '/admin');
+                      if (!context.mounted) {
+                        return;
+                      }
+                      if (v == 'credits') {
+                        Navigator.pushNamed(context, '/credits');
+                      }
+                      if (v == 'account') {
+                        Navigator.pushNamed(context, '/account');
+                      }
+                      if (v == 'history') {
+                        Navigator.pushNamed(
+                          context,
+                          '/history',
+                          arguments: 'tts',
+                        );
+                      }
+                      if (v == 'admin' && p.isSuperAdmin) {
+                        Navigator.pushNamed(context, '/admin');
+                      }
                     },
                     itemBuilder: (_) => [
                       PopupMenuItem(
-                          value: 'credits',
-                          child: Row(children: [
-                            const Icon(Icons.monetization_on, size: 18, color: AppColors.coinGold),
-                            const SizedBox(width: 8),
-                            Text('Nạp xu', style: GoogleFonts.inter(fontSize: 14))
-                          ])),
-                      PopupMenuItem(
-                          value: 'history',
-                          child: Row(children: [
-                            const Icon(Icons.history, size: 18),
-                            const SizedBox(width: 8),
-                            Text('Lịch sử', style: GoogleFonts.inter(fontSize: 14))
-                          ])),
-                      PopupMenuItem(
-                          value: 'admin',
-                          child: Row(children: [
-                            const Icon(Icons.admin_panel_settings, size: 18),
-                            const SizedBox(width: 8),
-                            Text('Admin Panel', style: GoogleFonts.inter(fontSize: 14))
-                          ])),
+                        enabled: false,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              p.displayName ?? p.email.split('@')[0],
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              p.email,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            CreditBadge(credits: p.credits, compact: true),
+                          ],
+                        ),
+                      ),
                       const PopupMenuDivider(),
                       PopupMenuItem(
-                          value: 'logout',
-                          child: Row(children: [
-                            const Icon(Icons.logout, size: 18, color: AppColors.error),
+                        value: 'credits',
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.monetization_on,
+                              size: 18,
+                              color: AppColors.textPrimary,
+                            ),
                             const SizedBox(width: 8),
-                            Text('Đăng xuất',
-                                style: GoogleFonts.inter(fontSize: 14, color: AppColors.error))
-                          ])),
+                            Text(
+                              'Nạp xu',
+                              style: GoogleFonts.inter(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'account',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.account_circle, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Tài khoản',
+                              style: GoogleFonts.inter(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'history',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.history, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Lịch sử',
+                              style: GoogleFonts.inter(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (p.isSuperAdmin)
+                        PopupMenuItem(
+                          value: 'admin',
+                          child: Row(
+                            children: [
+                              const Icon(Icons.admin_panel_settings, size: 18),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Admin Panel',
+                                style: GoogleFonts.inter(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem(
+                        value: 'logout',
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.logout,
+                              size: 18,
+                              color: AppColors.error,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Đăng xuất',
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                color: AppColors.error,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   )
                 : ElevatedButton.icon(
                     onPressed: () => Navigator.pushNamed(context, '/login'),
                     icon: const Text('🔵', style: TextStyle(fontSize: 14)),
-                    label: Text('Đăng nhập',
-                        style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600)),
+                    label: Text(
+                      'Đăng nhập',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.ttsGreen,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
-            loading: () => const SizedBox.shrink(),
-            error: (_, _) => const SizedBox.shrink(),
+            loading: () => const Center(
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+            error: (_, _) => const Center(
+              child: Icon(Icons.error_outline, color: AppColors.error),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildHero(BuildContext context, AsyncValue<UserProfile?> profileAsync) {
+  Widget _buildHero(
+    BuildContext context,
+    AsyncValue<UserProfile?> profileAsync,
+  ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
@@ -187,7 +366,11 @@ class HomePage extends ConsumerWidget {
         children: [
           ShaderMask(
             shaderCallback: (bounds) => const LinearGradient(
-              colors: [AppColors.primary, AppColors.sttPurple, AppColors.cloneOrange],
+              colors: [
+                AppColors.primary,
+                AppColors.sttPurple,
+                AppColors.cloneOrange,
+              ],
             ).createShader(bounds),
             child: Text(
               'Chuyển Đổi Giọng Nói & Văn Bản Với AI',
@@ -202,7 +385,10 @@ class HomePage extends ConsumerWidget {
           const SizedBox(height: 12),
           Text(
             'Text-to-Speech • Voice Clone • Speech-to-Text',
-            style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary),
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -251,12 +437,14 @@ class HomePage extends ConsumerWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: cards
-              .map((c) => Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: _buildFeatureColumn(context, c),
-                    ),
-                  ))
+              .map(
+                (c) => Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: _buildFeatureColumn(context, c),
+                  ),
+                ),
+              )
               .toList(),
         ),
       );
@@ -266,10 +454,12 @@ class HomePage extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: cards
-              .map((c) => Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: _buildFeatureColumn(context, c),
-                  ))
+              .map(
+                (c) => Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: _buildFeatureColumn(context, c),
+                ),
+              )
               .toList(),
         ),
       );
@@ -296,7 +486,9 @@ class HomePage extends ConsumerWidget {
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   gradient: data.gradient,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
                 ),
                 child: Column(
                   children: [
@@ -329,7 +521,10 @@ class HomePage extends ConsumerWidget {
                   children: [
                     Text(
                       data.subtitle,
-                      style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary),
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
@@ -339,7 +534,9 @@ class HomePage extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: data.accentColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: data.accentColor.withValues(alpha: 0.3)),
+                        border: Border.all(
+                          color: data.accentColor.withValues(alpha: 0.3),
+                        ),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -353,7 +550,11 @@ class HomePage extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(width: 6),
-                          Icon(Icons.arrow_forward, color: data.accentColor, size: 16),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: data.accentColor,
+                            size: 16,
+                          ),
                         ],
                       ),
                     ),

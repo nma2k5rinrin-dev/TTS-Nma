@@ -1,17 +1,48 @@
-# tts_nma
+# TTS Nma
 
-A new Flutter project.
+Flutter app for TTS, STT, and voice cloning with Supabase Edge Functions.
 
-## Getting Started
+## Current API bridge
 
-This project is a starting point for a Flutter application.
+- TTS: Microsoft Edge Read Aloud protocol, no API key.
+- STT: Groq Whisper (`whisper-large-v3-turbo`) through `stt-transcribe`.
+- Voice clone: Fish Audio model creation and cloned-voice TTS through `voice-clone`.
 
-A few resources to get you started if this is your first Flutter project:
+## Local run
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+flutter run -d chrome --dart-define-from-file=.env
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+`.env` must contain:
+
+```bash
+SUPABASE_URL=...
+SUPABASE_ANON_KEY=...
+```
+
+## Supabase setup
+
+Apply migrations, then deploy functions:
+
+```bash
+npx supabase db push
+npx supabase functions deploy tts-generate
+npx supabase functions deploy stt-transcribe
+npx supabase functions deploy voice-clone
+```
+
+Set backend-only secrets:
+
+```bash
+npx supabase secrets set SUPABASE_SERVICE_ROLE_KEY=...
+npx supabase secrets set GROQ_API_KEY=...
+npx supabase secrets set FISH_AUDIO_API_KEY=...
+```
+
+After deploy, a sadmin can override provider, API key, base URL, and model from
+Admin Panel -> Cài đặt API. Edge Functions read the active row in
+`api_configs` first and use the env secrets only as fallback.
+
+The `audio` storage bucket and upload/read policies are created by
+`supabase/migrations/002_audio_storage_and_voice_provider.sql`.

@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS public.voice_clones (
   description TEXT,
   sample_audio_url TEXT NOT NULL,
   clone_voice_id TEXT,
+  provider TEXT DEFAULT 'fish_audio',
   status TEXT DEFAULT 'processing' CHECK (status IN ('processing', 'ready', 'failed')),
   credits_used BIGINT NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -191,8 +192,8 @@ BEGIN
       split_part(NEW.email, '@', 1)
     ),
     -- Auto sadmin cho email admin
-    CASE WHEN NEW.email = 'nma.2k5rinrin@gmail.com' THEN 'sadmin' ELSE 'user' END,
-    CASE WHEN NEW.email = 'nma.2k5rinrin@gmail.com' THEN 99999 ELSE 0 END
+    CASE WHEN NEW.email IN ('nma.2k5rinrin@gmail.com', 'nma2k5.rinrin@gmail.com') THEN 'sadmin' ELSE 'user' END,
+    CASE WHEN NEW.email IN ('nma.2k5rinrin@gmail.com', 'nma2k5.rinrin@gmail.com') THEN 1000000 ELSE 0 END
   );
   RETURN NEW;
 END;

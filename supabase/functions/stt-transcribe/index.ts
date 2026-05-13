@@ -11,8 +11,59 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Groq API endpoint
-const GROQ_API_URL = "https://api.groq.com/openai/v1/audio/transcriptions";
+const DEFAULT_STT_BASE_URL = "https://api.groq.com/openai/v1";
+const DEFAULT_STT_MODEL = "whisper-large-v3-turbo";
+
+function audioMimeTypeFor(fileName: string, fallback = "audio/wav"): string {
+  const ext = fileName.split(".").pop()?.toLowerCase();
+  switch (ext) {
+    case "mp3":
+      return "audio/mpeg";
+    case "m4a":
+      return "audio/mp4";
+    case "flac":
+      return "audio/flac";
+    case "ogg":
+      return "audio/ogg";
+    case "webm":
+      return "audio/webm";
+    default:
+      return fallback;
+  }
+}
+
+function createServerConfigClient() {
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  return createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    serviceRoleKey || Deno.env.get("SUPABASE_ANON_KEY") || "",
+  );
+}
+
+function resolveTranscriptionUrl(baseUrl: string): string {
+  const trimmed = baseUrl.trim().replace(/\/+$/, "");
+  if (trimmed.endsWith("/audio/transcriptions")) return trimmed;
+  return `${trimmed || DEFAULT_STT_BASE_URL}/audio/transcriptions`;
+}
+
+async function getActiveApiConfig(service: string) {
+  const admin = createServerConfigClient();
+  const { data } = await admin
+    .from("api_configs")
+    .select("provider,api_key,base_url,config")
+    .eq("service", service)
+    .eq("is_active", true)
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  return data as {
+    provider?: string;
+    api_key?: string;
+    base_url?: string;
+    config?: Record<string, unknown>;
+  } | null;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -50,52 +101,59 @@ serve(async (req) => {
 
     // Check credits (50 xu per minute)
     const creditCost = estimatedMinutes * 50;
-    const { data: profile } = await supabase
+    
+    // Use admin client to bypass any RLS issues and prevent user manipulation of credits
+    const adminClient = createServerConfigClient();
+
+    const { data: profile, error: profileErr } = await adminClient
       .from("profiles").select("credits").eq("id", user.id).single();
 
-    if (!profile || profile.credits < creditCost) {
-      return new Response(JSON.stringify({ error: "Insufficient credits", required: creditCost, balance: profile?.credits ?? 0 }), {
+    if (profileErr || !profile || profile.credits < creditCost) {
+      return new Response(JSON.stringify({ 
+        error: "Insufficient credits or profile error", 
+        required: creditCost, 
+        balance: profile?.credits ?? 0,
+        debug_err: profileErr?.message 
+      }), {
         status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Get Groq API key from environment or api_configs table
-    let groqApiKey = Deno.env.get("GROQ_API_KEY") ?? "";
+    // Prefer sadmin-managed DB config; fall back to function secrets.
+    const apiConfig = await getActiveApiConfig("stt");
+    const sttApiKey = apiConfig?.api_key || Deno.env.get("GROQ_API_KEY") || "";
+    const sttBaseUrl = apiConfig?.base_url || Deno.env.get("STT_BASE_URL") || DEFAULT_STT_BASE_URL;
+    const sttModel =
+      (apiConfig?.config?.model as string | undefined) ||
+      Deno.env.get("GROQ_WHISPER_MODEL") ||
+      DEFAULT_STT_MODEL;
 
-    if (!groqApiKey) {
-      // Fallback: check api_configs table
-      const { data: apiConfig } = await supabase
-        .from("api_configs").select("api_key")
-        .eq("service", "stt").eq("is_active", true).single();
-
-      if (apiConfig) {
-        groqApiKey = apiConfig.api_key;
-      }
-    }
-
-    if (!groqApiKey) {
-      return new Response(JSON.stringify({ error: "STT service not configured. Set GROQ_API_KEY secret." }), {
+    if (!sttApiKey) {
+      return new Response(JSON.stringify({ error: "STT service not configured. Set API key in Admin > Cài đặt API." }), {
         status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     // Upload audio to storage
     const audioPath = `stt/${user.id}/${Date.now()}.${audioFile.name.split('.').pop()}`;
+    const contentType = audioFile.type?.startsWith("audio/")
+      ? audioFile.type
+      : audioMimeTypeFor(audioFile.name);
     const audioBytes = new Uint8Array(await audioFile.arrayBuffer());
-    await supabase.storage.from("audio").upload(audioPath, audioBytes, { contentType: audioFile.type });
-    const { data: audioUrl } = supabase.storage.from("audio").getPublicUrl(audioPath);
+    await adminClient.storage.from("audio").upload(audioPath, audioBytes, { contentType });
+    const { data: audioUrl } = adminClient.storage.from("audio").getPublicUrl(audioPath);
 
     // Call Groq Whisper API (FREE, super fast!)
     const whisperForm = new FormData();
     whisperForm.append("file", audioFile);
-    whisperForm.append("model", "whisper-large-v3-turbo");
+    whisperForm.append("model", sttModel);
     whisperForm.append("language", language);
     whisperForm.append("response_format", "verbose_json");
     whisperForm.append("temperature", "0");
 
-    const sttResponse = await fetch(GROQ_API_URL, {
+    const sttResponse = await fetch(resolveTranscriptionUrl(sttBaseUrl), {
       method: "POST",
-      headers: { "Authorization": `Bearer ${groqApiKey}` },
+      headers: { "Authorization": `Bearer ${sttApiKey}` },
       body: whisperForm,
     });
 
@@ -129,7 +187,7 @@ serve(async (req) => {
 
     // Deduct credits
     const newBalance = profile.credits - finalCost;
-    await supabase.from("profiles").update({ credits: newBalance }).eq("id", user.id);
+    await adminClient.from("profiles").update({ credits: newBalance }).eq("id", user.id);
 
     // Log transaction
     await supabase.from("credit_transactions").insert({

@@ -5,8 +5,15 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/common_widgets.dart';
 
 // Providers
-final selectedPackageProvider = NotifierProvider<SelectedPackageNotifier, int?>(SelectedPackageNotifier.new);
-class SelectedPackageNotifier extends Notifier<int?> { @override int? build() => null; void set(int? v) => state = v; }
+final selectedPackageProvider = NotifierProvider<SelectedPackageNotifier, int?>(
+  SelectedPackageNotifier.new,
+);
+
+class SelectedPackageNotifier extends Notifier<int?> {
+  @override
+  int? build() => null;
+  void set(int? v) => state = v;
+}
 
 class CreditsPage extends ConsumerWidget {
   const CreditsPage({super.key});
@@ -34,14 +41,30 @@ class CreditsPage extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Nạp Xu',
-            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+        title: Text(
+          'Nạp Xu',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
+        ),
         centerTitle: false,
         actions: [
           TextButton.icon(
             onPressed: () => _showHistory(context),
-            icon: const Icon(Icons.history, size: 18, color: AppColors.textSecondary),
-            label: Text('Lịch sử', style: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 13)),
+            icon: const Icon(
+              Icons.history,
+              size: 18,
+              color: AppColors.textSecondary,
+            ),
+            label: Text(
+              'Lịch sử',
+              style: GoogleFonts.inter(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+              ),
+            ),
           ),
           const SizedBox(width: 8),
         ],
@@ -57,8 +80,14 @@ class CreditsPage extends ConsumerWidget {
                 children: [
                   _buildBalanceCard(),
                   const SizedBox(height: 24),
-                  Text('Chọn gói nạp',
-                      style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                  Text(
+                    'Chọn gói nạp',
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   _buildPackageGrid(ref, selected, isWide),
                   const SizedBox(height: 24),
@@ -96,18 +125,32 @@ class CreditsPage extends ConsumerWidget {
               gradient: AppColors.goldGradient,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(Icons.monetization_on, color: Colors.white, size: 32),
+            child: const Icon(
+              Icons.monetization_on,
+              color: Colors.white,
+              size: 32,
+            ),
           ),
           const SizedBox(width: 20),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Số dư hiện tại',
-                  style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+              Text(
+                'Số dư hiện tại',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                ),
+              ),
               const SizedBox(height: 4),
-              Text('0 xu',
-                  style: GoogleFonts.inter(
-                      fontSize: 28, fontWeight: FontWeight.w800, color: AppColors.coinGold)),
+              Text(
+                '0 xu',
+                style: GoogleFonts.inter(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.coinGold,
+                ),
+              ),
             ],
           ),
         ],
@@ -141,7 +184,9 @@ class CreditsPage extends ConsumerWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : AppColors.surfaceCard,
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : AppColors.surfaceCard,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.surfaceBorder,
@@ -155,25 +200,46 @@ class CreditsPage extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: isPro ? AppColors.coinGold.withValues(alpha: 0.2) : AppColors.ttsGreen.withValues(alpha: 0.2),
+                  color: isPro
+                      ? AppColors.coinGold.withValues(alpha: 0.2)
+                      : AppColors.ttsGreen.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: Text('+$bonus%',
-                    style: GoogleFonts.inter(
-                        fontSize: 11, fontWeight: FontWeight.w700,
-                        color: isPro ? AppColors.coinGold : AppColors.ttsGreen)),
+                child: Text(
+                  '+$bonus%',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: isPro ? AppColors.coinGold : AppColors.ttsGreen,
+                  ),
+                ),
               ),
             const SizedBox(height: 6),
-            Text(pkg['name'] as String,
-                style: GoogleFonts.inter(
-                    fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+            Text(
+              pkg['name'] as String,
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text('${_formatNumber(pkg['credits'] as int)} xu',
-                style: GoogleFonts.inter(
-                    fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.coinGold)),
+            Text(
+              '${_formatNumber(pkg['credits'] as int)} xu',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: AppColors.coinGold,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text('${_formatNumber(pkg['price'] as int)} VNĐ',
-                style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+            Text(
+              '${_formatNumber(pkg['price'] as int)} VNĐ',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+              ),
+            ),
           ],
         ),
       ),
@@ -186,8 +252,14 @@ class CreditsPage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('💰 Bảng giá dịch vụ',
-              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+          Text(
+            '💰 Bảng giá dịch vụ',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+            ),
+          ),
           const SizedBox(height: 12),
           _priceRow('🗣️ TTS Cơ bản', '1 xu / 100 ký tự'),
           _priceRow('⭐ TTS Premium', '3 xu / 100 ký tự'),
@@ -205,8 +277,21 @@ class CreditsPage extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
-          Text(price, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          Text(
+            price,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
         ],
       ),
     );
@@ -217,12 +302,16 @@ class CreditsPage extends ConsumerWidget {
       width: double.infinity,
       height: 54,
       child: ElevatedButton(
-        onPressed: selected == null ? null : () => _showPaymentMethods(context, selected),
+        onPressed: selected == null
+            ? null
+            : () => _showPaymentMethods(context, selected),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.coinGold,
           disabledBackgroundColor: AppColors.coinGold.withValues(alpha: 0.3),
           foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
         child: Text(
           selected != null
@@ -247,13 +336,31 @@ class CreditsPage extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.surfaceBorder, borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceBorder,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 20),
-            Text('Chọn phương thức thanh toán',
-                style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+            Text(
+              'Chọn phương thức thanh toán',
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text('${pkg['name']} — ${_formatNumber(pkg['price'] as int)} VNĐ',
-                style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary)),
+            Text(
+              '${pkg['name']} — ${_formatNumber(pkg['price'] as int)} VNĐ',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
+            ),
             const SizedBox(height: 24),
             _payMethod(ctx, '🏦', 'Chuyển khoản ngân hàng', 'Bank Transfer'),
             const SizedBox(height: 10),
@@ -269,13 +376,16 @@ class CreditsPage extends ConsumerWidget {
     );
   }
 
-  Widget _payMethod(BuildContext ctx, String icon, String label, String method) {
+  Widget _payMethod(
+    BuildContext ctx,
+    String icon,
+    String label,
+    String method,
+  ) {
     return InkWell(
       onTap: () {
         Navigator.pop(ctx);
-        ScaffoldMessenger.of(ctx).showSnackBar(
-          SnackBar(content: Text('Thanh toán $method sẽ được tích hợp!'), backgroundColor: AppColors.info),
-        );
+        AppToast.info(ctx, 'Thanh toán $method sẽ được tích hợp!');
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -290,9 +400,20 @@ class CreditsPage extends ConsumerWidget {
           children: [
             Text(icon, style: const TextStyle(fontSize: 22)),
             const SizedBox(width: 14),
-            Text(label, style: GoogleFonts.inter(fontSize: 15, color: AppColors.textPrimary, fontWeight: FontWeight.w500)),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             const Spacer(),
-            const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.textMuted),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: AppColors.textMuted,
+            ),
           ],
         ),
       ),
@@ -304,7 +425,9 @@ class CreditsPage extends ConsumerWidget {
       context: context,
       backgroundColor: AppColors.surfaceCard,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (ctx) => DraggableScrollableSheet(
         initialChildSize: 0.6,
         maxChildSize: 0.9,
@@ -313,20 +436,41 @@ class CreditsPage extends ConsumerWidget {
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
-              Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.surfaceBorder, borderRadius: BorderRadius.circular(2))),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceBorder,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
               const SizedBox(height: 20),
-              Text('Lịch sử giao dịch',
-                  style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              Text(
+                'Lịch sử giao dịch',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
               const SizedBox(height: 24),
               Expanded(
                 child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.receipt_long, color: AppColors.textMuted, size: 48),
+                      const Icon(
+                        Icons.receipt_long,
+                        color: AppColors.textMuted,
+                        size: 48,
+                      ),
                       const SizedBox(height: 12),
-                      Text('Chưa có giao dịch',
-                          style: GoogleFonts.inter(color: AppColors.textSecondary)),
+                      Text(
+                        'Chưa có giao dịch',
+                        style: GoogleFonts.inter(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -340,7 +484,8 @@ class CreditsPage extends ConsumerWidget {
 
   String _formatNumber(int n) {
     if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(0)}M';
-    if (n >= 1000) return '${n.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')}';
+    if (n >= 1000)
+      return '${n.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')}';
     return n.toString();
   }
 }
